@@ -1,0 +1,32 @@
+name: Collect facts
+
+on:
+  schedule:
+    - cron: "0 6 2 * *"   # 06:00 UTC on the 2nd of each month: collect the previous month
+  push:
+    paths: [hidden.txt]   # re-publish without newly hidden facts
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s collector
+      - name: Collect last month
+        if: github.event_name != 'push'
+        run: python collector/collect.py --last-month
+      - name: Apply hidden.txt
+        run: python collector/collect.py --apply-hidden
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          if ! git diff --cached --quiet; then git commit -m "Update facts" && git push; fi

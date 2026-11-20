@@ -1,0 +1,2 @@
+# Fact IDs that should never be published, one per line (the ID is in the note's tooltip).
+# Pushing a change to this file re-publishes the data without them.

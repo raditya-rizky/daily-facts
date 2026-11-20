@@ -1,0 +1,4 @@
+collector/cache/
+__pycache__/
+FunFact/cache.txt
+collector/backfill.log
